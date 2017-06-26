@@ -1,0 +1,38 @@
+<script type="text/javascript">
+    RED.nodes.registerType('discovery-insert',{
+        category: 'function',
+        color: '#a6bbcf',
+        defaults: {
+            name: {value:""}
+        },
+        credentials: {
+        username: {type:"text"},
+        password: {type:"password"}
+        },
+        inputs:1,
+        outputs:1,
+        icon: "file.png",
+        label: function() {
+            return this.name||"discovery-insert-case";
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="discovery-insert">
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+     <div class="form-row">
+     <label for="node-input-username"><i class="icon-tag"></i> Username</label>
+     <input type="text" id="node-input-username">
+ </div>
+ <div class="form-row">
+     <label for="node-input-password"><i class="icon-tag"></i> Password</label>
+     <input type="password" id="node-input-password">
+ </div>
+</script>
+
+<script type="text/x-red" data-help-name="discovery-insert">
+    <p>A simple node that converts the message payloads into all lower-case characters</p>
+</script>
