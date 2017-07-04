@@ -3,7 +3,7 @@
     "version"      : "0.0.1",
     "description"  : "A node for inserting documents into the watson discovery service.",
     "dependencies": {
-    "watson-developer-cloud": "^2.32.0"
+    "watson-developer-cloud": "^2.33.0"
 
     },
     "keywords": [ "node-red" ],
