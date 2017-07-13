@@ -15,29 +15,92 @@ module.exports = function (RED) {
     var environment = config.environment;
     var collection = config.collection;
 
+    var document_queue = [];
+    var delay = 1000;
+
+
+    function sendToDiscovery(msg) {
+      return new Promise(function (resolve, reject) {
+        var document_obj = {
+          environment_id: environment,
+          collection_id: collection,
+          file: msg.payload
+        };
+
+        discovery.addJsonDocument(document_obj, function (err, response) {
+          if (err) {
+
+            if (err.code == 429) {
+              resolve(429);
+
+            } else {
+              reject(err);
+            }
+          } else {
+            resolve(response);
+
+          }
+        });
+      });
+    }
+
+    function processQueue() {
+      if (document_queue.length !== 0) {
+        node.status({fill:"red",shape:"dot",text:"Queue Size: "+document_queue.length});
+
+
+        var msg = document_queue.pop();
+        sendToDiscovery(msg).then(function (response) {
+
+          if (response !== 429) {
+            msg.payload = response;
+            node.send(msg);
+          } else {
+            addToQueue(msg);
+          }
+
+
+        }).catch(function (err) {
+          node.error("" + err, msg);
+        });
+
+
+
+
+      } else {
+        node.status({fill:"green",shape:"dot",text:"Queue empty"});
+      }
+
+      setTimeout(processQueue, delay);
+    }
+
+
+    function addToQueue(msg) {
+      document_queue.push(msg);
+    }
+
+
+    setTimeout(processQueue, 0);
 
     node.on('input', function (msg) {
 
-      var document_obj = {
-        environment_id: environment,
-        collection_id: collection,
-        file: msg.payload
-      };
+      sendToDiscovery(msg).then(function (response) {
 
-      console.log(document_obj);
-
-      discovery.addJsonDocument(document_obj, function (err, response) {
-        if (err) {
-          node.error(""+err, msg);
-        } else {
+        if (response !== 429) {
           msg.payload = response;
           node.send(msg);
+        } else if (response === 429)  {
+          addToQueue(msg);
         }
+
+
+      }).catch(function (err) {
+        node.error("" + err, msg);
       });
 
 
-
     });
+
   }
 
 
