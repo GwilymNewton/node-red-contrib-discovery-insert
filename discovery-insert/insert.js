@@ -21,9 +21,14 @@ module.exports = function (RED) {
 
     function sendToDiscovery(msg) {
       return new Promise(function (resolve, reject) {
+
+        var env = (msg.hasOwnProperty('environment_id')) ? msg.environment_id : environment;
+        var col = (msg.hasOwnProperty('collection_id')) ? msg.collection_id : collection;
+
+
         var document_obj = {
-          environment_id: environment,
-          collection_id: collection,
+          environment_id: env,
+          collection_id: col,
           file: msg.payload
         };
 
