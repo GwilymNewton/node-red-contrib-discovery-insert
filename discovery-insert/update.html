@@ -1,0 +1,48 @@
+<script type="text/javascript">
+    RED.nodes.registerType('discovery-update',{
+        category: 'function',
+        color: '#a6bbcf',
+        defaults: {
+            name: {value:""},
+            environment:{value:""},
+            collection:{value:""},
+        },
+        credentials: {
+        username: {type:"text"},
+        password: {type:"password"}
+        },
+        inputs:1,
+        outputs:1,
+        icon: "file.png",
+        label: function() {
+            return this.name||"discovery-update";
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="discovery-update">
+    <div class="form-row">
+        <label for="node-input-environment"><i class="icon-tag"></i> Environment</label>
+        <input type="text" id="node-input-environment" placeholder="environment">
+    </div>
+    <div class="form-row">
+        <label for="node-input-collection"><i class="icon-tag"></i> Collection</label>
+        <input type="text" id="node-input-collection" placeholder="collection">
+    </div>
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+     <div class="form-row">
+     <label for="node-input-username"><i class="icon-tag"></i> Username</label>
+     <input type="text" id="node-input-username">
+ </div>
+ <div class="form-row">
+     <label for="node-input-password"><i class="icon-tag"></i> Password</label>
+     <input type="password" id="node-input-password">
+ </div>
+</script>
+
+<script type="text/x-red" data-help-name="discovery-update">
+    <p>A simple node that sends data to the watson discovery service.</p>
+</script>

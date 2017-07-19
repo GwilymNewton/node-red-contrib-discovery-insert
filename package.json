@@ -22,7 +22,8 @@
   "keywords": ["node-red"],
   "node-red": {
     "nodes": {
-      "discovery-insert": "discovery-insert/insert.js"
+      "discovery-insert": "discovery-insert/insert.js",
+      "discovery-update": "discovery-insert/update.js"
     }
   }
 }
