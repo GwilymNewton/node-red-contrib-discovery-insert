@@ -16,8 +16,9 @@ module.exports = function (RED) {
     var collection = config.collection;
 
     var document_queue = [];
-    var delay = 1000;
 
+    //allow for overide of delay
+    var delay = (config.delay!==0) ? config.delay : 1000;
 
     function sendToDiscovery(msg) {
       return new Promise(function (resolve, reject) {

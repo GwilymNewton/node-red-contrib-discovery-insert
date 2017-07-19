@@ -6,6 +6,7 @@
             name: {value:""},
             environment:{value:""},
             collection:{value:""},
+            delay:{value:1000,validate:RED.validators.number() },
         },
         credentials: {
         username: {type:"text"},
@@ -40,6 +41,10 @@
  <div class="form-row">
      <label for="node-input-password"><i class="icon-tag"></i> Password</label>
      <input type="password" id="node-input-password">
+ </div>
+  <div class="form-row">
+     <label for="node-input-delay"><i class="icon-tag"></i> Delay</label>
+     <input type="text" id="node-input-delay" placeholder="1000">
  </div>
 </script>
 
