@@ -12,7 +12,7 @@
   "homepage": "https://www.emerging-technology.co.uk/",
 
   "dependencies": {
-    "watson-developer-cloud": "^2.34.0"
+    "watson-developer-cloud": "^2.35.0"
 
   },
   "repository": {
