@@ -10,16 +10,16 @@
     }
   ],
   "homepage": "https://www.emerging-technology.co.uk/",
-
   "dependencies": {
     "watson-developer-cloud": "^2.35.0"
-
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/GwilymNewton/node-red-contrib-discovery-insert.git"
   },
-  "keywords": ["node-red"],
+  "keywords": [
+    "node-red"
+  ],
   "node-red": {
     "nodes": {
       "discovery-insert": "discovery-insert/insert.js",
