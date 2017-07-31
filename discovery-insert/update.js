@@ -17,7 +17,13 @@ module.exports = function (RED) {
 
     var document_queue = [];
     //allow for overide of delay
-    var delay = (config.delay!==0) ? config.delay : 1000;
+    var delay = (config.delay !== 0) ? parseInt(config.delay) : 1000;
+    //update Q size once per second.
+    var status_update_period = 500;
+
+    //start Q
+    setInterval(processQueue, delay);
+    setInterval(updateStatus, status_update_period);
 
 
     function updateInDiscovery(msg) {
@@ -32,7 +38,7 @@ module.exports = function (RED) {
         var document_obj = {
           environment_id: env,
           collection_id: col,
-          document_id:doc,
+          document_id: doc,
           file: msg.payload
         };
 
@@ -53,62 +59,67 @@ module.exports = function (RED) {
       });
     }
 
+
+
+
     function processQueue() {
       if (document_queue.length !== 0) {
-        node.status({fill:"red",shape:"dot",text:"Queue Size: "+document_queue.length});
-
 
         var msg = document_queue.pop();
-        updateInDiscovery(msg).then(function (response) {
 
-          if (response !== 429) {
-            msg.payload = response;
-            node.send(msg);
-          } else {
-            addToQueue(msg);
-          }
-
-
-        }).catch(function (err) {
-          node.error("" + err, msg);
-        });
-
-
-
-
-      } else {
-        node.status({fill:"green",shape:"dot",text:"Queue empty"});
+        updateDiscovery(msg);
       }
-
-      setTimeout(processQueue, delay);
     }
+
+    function updateStatus() {
+      var size = document_queue.length;
+      if (size !== 0) {
+        node.status({
+          fill: "red",
+          shape: "dot",
+          text: "Queue Size: " + size
+        });
+      } else {
+        node.status({
+          fill: "green",
+          shape: "dot",
+          text: "Queue empty"
+        });
+      }
+    }
+
 
 
     function addToQueue(msg) {
       document_queue.push(msg);
     }
 
-
-    setTimeout(processQueue, 0);
-
-    node.on('input', function (msg) {
-
+    function updateDiscovery(msg) {
       updateInDiscovery(msg).then(function (response) {
 
         if (response !== 429) {
           msg.payload = response;
+          msg.q_size = document_queue.length;
           node.send(msg);
-        } else if (response === 429)  {
+        } else if (response === 429) {
           addToQueue(msg);
         }
 
 
       }).catch(function (err) {
-        node.error("" + err, msg);
+        if (("" + err).includes("ECONNREFUSED")) {
+          addToQueue(msg);
+        } else {
+          node.error("" + err);
+        }
+
+      });
+    }
+
+      node.on('input', function (msg) {
+        updateDiscovery(msg);
       });
 
-
-    });
 
   }
 
