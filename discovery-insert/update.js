@@ -15,11 +15,13 @@ module.exports = function (RED) {
     var environment = config.environment;
     var collection = config.collection;
 
-    var document_queue = [];
+    var update_queue = [];
     //allow for overide of delay
     var delay = (config.delay !== 0) ? parseInt(config.delay) : 1000;
+    var max_Q_size = (config.max_Q_size !== 0) ? parseInt(config.max_Q_size) : 10000;
+
     //update Q size once per second.
-    var status_update_period = 500;
+    var status_update_period = 750;
 
     //start Q
     setInterval(processQueue, delay);
@@ -63,16 +65,16 @@ module.exports = function (RED) {
 
 
     function processQueue() {
-      if (document_queue.length !== 0) {
+      if (update_queue.length !== 0) {
 
-        var msg = document_queue.pop();
+        var msg = update_queue.pop();
 
         updateDiscovery(msg);
       }
     }
 
     function updateStatus() {
-      var size = document_queue.length;
+      var size = update_queue.length;
       if (size !== 0) {
         node.status({
           fill: "red",
@@ -91,7 +93,14 @@ module.exports = function (RED) {
 
 
     function addToQueue(msg) {
-      document_queue.push(msg);
+      if (update_queue.length < max_Q_size)
+        {
+          update_queue.push(msg);
+        }
+        else
+          {
+            node.error("Queue Full, dropping Message");
+          }
     }
 
     function updateDiscovery(msg) {
@@ -99,7 +108,7 @@ module.exports = function (RED) {
 
         if (response !== 429) {
           msg.payload = response;
-          msg.q_size = document_queue.length;
+          msg.q_size = update_queue.length;
           node.send(msg);
         } else if (response === 429) {
           addToQueue(msg);

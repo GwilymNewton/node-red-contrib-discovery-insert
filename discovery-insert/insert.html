@@ -16,6 +16,10 @@
         value: 1000,
         validate: RED.validators.number()
       },
+      max_Q_size: {
+        value: 10000,
+        validate: RED.validators.number()
+      },
     },
     credentials: {
       username: {
@@ -58,6 +62,10 @@
   <div class="form-row">
     <label for="node-input-delay"><i class="icon-tag"></i> Delay</label>
     <input type="text" id="node-input-delay" placeholder="1000">
+  </div>
+  <div class="form-row">
+    <label for="node-input-max_Q_size"><i class="icon-tag"></i> Max Q</label>
+    <input type="text" id="node-input-max_Q_size" placeholder="10000">
   </div>
 </script>
 
