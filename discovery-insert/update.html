@@ -74,4 +74,12 @@
   <code>msg.environment_id</code> will override environment_id
   <code>msg.collection_id</code> will override collection_id
   <code>msg.document_id</code> is <b>Required</b>
+
+    <p>To switch between JSON & Files set </p>
+  <code>msg.datatype</code> to <code>"JSON"</code> or <code>"BIN"</code>
+
+  For use with Binnary files. e.g pdf. or dox set
+
+  <code>msg.payload.content</code> to a Buffer containg the file contents
+  <code>msg.payload.filename</code> to the name of the file.
 </script>
