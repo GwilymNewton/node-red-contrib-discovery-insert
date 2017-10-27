@@ -28,7 +28,7 @@ module.exports = function (RED) {
     setInterval(updateStatus, status_update_period);
 
 
-    function updateInDiscovery(msg) {
+    function updateInDiscoveryJSON(msg) {
       return new Promise(function (resolve, reject) {
 
         var env = (msg.hasOwnProperty('environment_id')) ? msg.environment_id : environment;
@@ -45,6 +45,44 @@ module.exports = function (RED) {
         };
 
         discovery.updateJsonDocument(document_obj, function (err, response) {
+          if (err) {
+
+            if (err.code == 429) {
+              resolve(429);
+
+            } else {
+              reject(err);
+            }
+          } else {
+            resolve(response);
+
+          }
+        });
+      });
+    }
+
+        function updateInDiscoveryBIN(msg) {
+      return new Promise(function (resolve, reject) {
+
+        var env = (msg.hasOwnProperty('environment_id')) ? msg.environment_id : environment;
+        var col = (msg.hasOwnProperty('collection_id')) ? msg.collection_id : collection;
+        var doc = (msg.hasOwnProperty('document_id')) ? msg.document_id : null;
+
+
+
+        var document_obj = {
+          environment_id: env,
+          collection_id: col,
+          document_id: doc,
+          file:{
+          value: msg.payload.content,
+          options: {
+            filename: msg.payload.fileName
+          }
+          }
+        };
+
+        discovery.updateDocument(document_obj, function (err, response) {
           if (err) {
 
             if (err.code == 429) {
@@ -104,7 +142,10 @@ module.exports = function (RED) {
     }
 
     function updateDiscovery(msg) {
-      updateInDiscovery(msg).then(function (response) {
+
+      var update = (msg.datatype == "JSON") ? updateInDiscoveryJSON : updateInDiscoveryBIN;
+
+      update(msg).then(function (response) {
 
         if (response !== 429) {
           msg.payload = response;

@@ -26,12 +26,12 @@ module.exports = function (RED) {
 
     //start Q
     var pq_to = setInterval(processQueue, delay);
-    var up_to = setInterval(updateStatus, status_update_period,'');
+    var up_to = setInterval(updateStatus, status_update_period, '');
 
 
     //START OFF FUNCTIONS
 
-    function sendToDiscovery(msg) {
+    function sendToDiscoveryJSON(msg) {
       return new Promise(function (resolve, reject) {
 
         var env = (msg.hasOwnProperty('environment_id')) ? msg.environment_id : environment;
@@ -59,6 +59,41 @@ module.exports = function (RED) {
         });
       });
     }
+
+    function sendToDiscoveryBIN(msg) {
+      return new Promise(function (resolve, reject) {
+
+        var env = (msg.hasOwnProperty('environment_id')) ? msg.environment_id : environment;
+        var col = (msg.hasOwnProperty('collection_id')) ? msg.collection_id : collection;
+
+        var document_obj = {
+          environment_id: env,
+          collection_id: col,
+          file:{
+          value: msg.payload.content,
+          options: {
+            filename: msg.payload.fileName
+          }
+          }
+        };
+
+        discovery.addDocument(document_obj, function (err, response) {
+          if (err) {
+
+            if (err.code == 429) {
+              resolve(429);
+
+            } else {
+              reject(err);
+            }
+          } else {
+            resolve(response);
+
+          }
+        });
+      });
+    }
+
 
     function processQueue() {
       if (insert_queue.length !== 0) {
@@ -88,7 +123,10 @@ module.exports = function (RED) {
 
 
     function addToDiscovery(msg) {
-      sendToDiscovery(msg).then(function (response) {
+
+      var send = (msg.datatype == "JSON") ? sendToDiscoveryJSON : sendToDiscoveryBIN;
+
+      send(msg).then(function (response) {
 
         if (response !== 429) {
           msg.payload = response;
@@ -117,15 +155,15 @@ module.exports = function (RED) {
       }
     }
 
-      node.on('input', function (msg) {
+    node.on('input', function (msg) {
       addToDiscovery(msg);
     });
 
-    this.on('close', function() {
-    // tidy up any
+    this.on('close', function () {
+      // tidy up any
       clearInterval(pq_to);
       clearInterval(up_to);
-});
+    });
 
 
   }
