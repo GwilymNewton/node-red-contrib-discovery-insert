@@ -77,7 +77,7 @@ module.exports = function (RED) {
           file:{
           value: msg.payload.content,
           options: {
-            filename: msg.payload.fileName
+            filename: msg.payload.filename
           }
           }
         };
