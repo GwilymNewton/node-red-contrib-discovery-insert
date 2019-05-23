@@ -145,7 +145,7 @@ module.exports = function (RED) {
         function updateDiscovery(msg) {
             var update = updateInDiscoveryJSON;
 
-            if (msg.payload.content instanceof Buffer || msg.payload.content instanceof stream.Readable || msg.payload.content instanceof FileObject) {
+            if (msg.payload.content instanceof Buffer || msg.payload.content instanceof stream.Readable) {
                 update = updateInDiscoveryBIN;
             }
 

@@ -141,7 +141,7 @@ module.exports = function (RED) {
         function addToDiscovery(msg) {
             var send = sendToDiscoveryJSON;
 
-            if (msg.payload.content instanceof Buffer || msg.payload.content instanceof stream.Readable || msg.payload.content instanceof FileObject) {
+            if (msg.payload.content instanceof Buffer || msg.payload.content instanceof stream.Readable) {
                 send = sendToDiscoveryBIN;
             }
 
