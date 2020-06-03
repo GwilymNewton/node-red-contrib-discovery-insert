@@ -1,17 +1,22 @@
 {
-  "name": "node-red-contrib-discovery-insert",
+  "name": "node-red-contrib-discovery-insert-temp",
   "description": "A node for inserting documents into the watson discovery service.",
-  "version": "0.1.8",
+  "version": "0.1.10",
   "maintainers": [
     {
       "name": "Gwilym Newton",
       "email": "gwilnew@uk.ibm.com",
       "web": "https://www.emerging-technology.co.uk/"
+    },
+    {
+      "name": "Valerio Riva",
+      "email": "lotti86@gmail.com",
+      "web": "https://www.twitch.tv/valerioriva/"
     }
   ],
   "homepage": "https://www.emerging-technology.co.uk/",
   "dependencies": {
-    "ibm-watson": "^4.1.1"
+    "ibm-watson": "^5.5.0"
   },
   "repository": {
     "type": "git",

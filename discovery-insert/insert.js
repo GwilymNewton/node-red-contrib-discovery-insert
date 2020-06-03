@@ -1,26 +1,28 @@
 var crypto = require('crypto');
 var stream = require('stream');
+var { IamAuthenticator, BasicAuthenticator } = require('ibm-watson/auth');
+var DiscoveryV1 = require('ibm-watson/discovery/v1');
 
 module.exports = function (RED) {
     function DiscoveryInsert(config) {
         RED.nodes.createNode(this, config);
         var node = this;
 
-        var DiscoveryV1 = require('ibm-watson/discovery/v1');
-
         var options = {
-            version: '2019-03-25',
+            version: '2019-04-30',
+            headers: {
+                'X-Watson-Learning-Opt-Out': 'true'
+            }
         };
 
         if (config.endpoint) {
-            options.endpoint = config.endpoint;
+            options.url = config.endpoint;
         }
 
         if (this.credentials.apikey) {
-            options.iam_apikey = this.credentials.apikey;
+            options.authenticator = new IamAuthenticator({apikey: this.credentials.apikey});
         } else {
-            options.username = this.credentials.username;
-            options.password = this.credentials.password;
+            options.authenticator = new BasicAuthenticator({username: this.credentials.username, password: this.credentials.password});
         }
 
         var discovery = new DiscoveryV1(options);
@@ -58,22 +60,20 @@ module.exports = function (RED) {
                 const filename = msg.payload.filename || `${sha1}.json`;
 
                 var document_obj = {
-                    environment_id: env,
-                    collection_id: col,
+                    environmentId: env,
+                    collectionId: col,
                     file: file,
                     filename: filename,
-                    file_content_type: 'application/json',
+                    fileContentType: 'application/json',
                 };
 
-                discovery.addDocument(document_obj, function (err, response) {
-                    if (err) {
-                        if (err.code === 429) {
-                            resolve(429);
-                        } else {
-                            reject(err);
-                        }
+                return discovery.addDocument(document_obj).then((response) => {
+                    resolve(response);
+                }).catch((err) => {
+                    if (err.code === 429) {
+                        resolve(429);
                     } else {
-                        resolve(response);
+                        reject(err);
                     }
                 });
             });
@@ -86,36 +86,28 @@ module.exports = function (RED) {
                 var col = (msg.hasOwnProperty('collection_id')) ? msg.collection_id : collection;
 
                 var document_obj = {
-                    environment_id: env,
-                    collection_id: col,
+                    environmentId: env,
+                    collectionId: col,
                     file: msg.payload.content,
                     filename: msg.payload.filename,
-                    file_content_type: msg.payload.file_content_type || undefined,
+                    fileContentType: msg.payload.file_content_type || undefined,
                 };
 
-                discovery.addDocument(document_obj, function (err, response) {
-                    if (err) {
-
-                        if (err.code === 429) {
-                            resolve(429);
-
-                        } else {
-                            reject(err);
-                        }
+                discovery.addDocument(document_obj).then((response) => {
+                    resolve(response);
+                }).catch((err) => {
+                    if (err.code === 429) {
+                        resolve(429);
                     } else {
-                        resolve(response);
-
+                        reject(err);
                     }
                 });
             });
         }
 
-
         function processQueue() {
             if (insert_queue.length !== 0) {
-
                 var msg = insert_queue.pop();
-
                 addToDiscovery(msg);
             }
         }
@@ -159,7 +151,6 @@ module.exports = function (RED) {
                 } else {
                     node.error("" + err);
                 }
-
             });
         }
 
