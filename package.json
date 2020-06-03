@@ -20,7 +20,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/GwilymNewton/node-red-contrib-discovery-insert.git"
+    "url": "https://github.com/Lotti/node-red-contrib-discovery-insert"
   },
   "keywords": [
     "node-red"
