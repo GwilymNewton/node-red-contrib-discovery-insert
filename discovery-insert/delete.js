@@ -4,7 +4,7 @@ var { IamAuthenticator, BasicAuthenticator } = require('ibm-watson/auth');
 var DiscoveryV1 = require('ibm-watson/discovery/v1');
 
 module.exports = function (RED) {
-    function DiscoveryInsert(config) {
+    function DiscoveryDelete(config) {
         RED.nodes.createNode(this, config);
         var node = this;
 
@@ -29,7 +29,7 @@ module.exports = function (RED) {
         var environment = config.environment;
         var collection = config.collection;
 
-        var insert_queue = [];
+        var delete_queue = [];
 
         //allow for override of delay
         var delay = (config.delay !== 0) ? parseInt(config.delay) : 1000;
@@ -39,61 +39,25 @@ module.exports = function (RED) {
         var status_update_period = 750;
 
         //start Q
-        var pq_to = setInterval(processQueue, delay);
-        var up_to = setInterval(updateStatus, status_update_period, '');
+        setInterval(processQueue, delay);
+        setInterval(updateStatus, status_update_period);
 
 
         //START OFF FUNCTIONS
-        function getSHA1(input) {
-            return crypto.createHash('sha1').update(JSON.stringify(input)).digest('hex');
-        }
-
-        function sendToDiscoveryJSON(msg) {
+        function deleteDocumentDiscovery(msg) {
             return new Promise(function (resolve, reject) {
 
                 var env = (msg.hasOwnProperty('environment_id')) ? msg.environment_id : environment;
                 var col = (msg.hasOwnProperty('collection_id')) ? msg.collection_id : collection;
-
-                const string = JSON.stringify(msg.payload.content);
-                const file = Buffer.from(string, 'utf8');
-                const sha1 = getSHA1(string);
-                const filename = msg.payload.filename || `${sha1}.json`;
+                var doc = (msg.hasOwnProperty('document_id')) ? msg.document_id : null;
 
                 var document_obj = {
                     environmentId: env,
                     collectionId: col,
-                    file: file,
-                    filename: filename,
-                    fileContentType: 'application/json',
+                    documentId: doc,
                 };
 
-                return discovery.addDocument(document_obj).then((response) => {
-                    resolve(response);
-                }).catch((err) => {
-                    if (err.code === 429) {
-                        resolve(429);
-                    } else {
-                        reject(err);
-                    }
-                });
-            });
-        }
-
-        function sendToDiscoveryBIN(msg) {
-            return new Promise(function (resolve, reject) {
-
-                var env = (msg.hasOwnProperty('environment_id')) ? msg.environment_id : environment;
-                var col = (msg.hasOwnProperty('collection_id')) ? msg.collection_id : collection;
-
-                var document_obj = {
-                    environmentId: env,
-                    collectionId: col,
-                    file: msg.payload.content,
-                    filename: msg.payload.filename,
-                    fileContentType: msg.payload.file_content_type || undefined,
-                };
-
-                discovery.addDocument(document_obj).then((response) => {
+                discovery.deleteDocument(document_obj).then((response) => {
                     resolve(response);
                 }).catch((err) => {
                     if (err.code === 429) {
@@ -106,14 +70,14 @@ module.exports = function (RED) {
         }
 
         function processQueue() {
-            if (insert_queue.length !== 0) {
-                var msg = insert_queue.pop();
-                addToDiscovery(msg);
+            if (delete_queue.length !== 0) {
+                var msg = delete_queue.pop();
+                deleteDiscovery(msg);
             }
         }
 
         function updateStatus() {
-            var size = insert_queue.length;
+            var size = delete_queue.length;
             if (size !== 0) {
                 node.status({
                     fill: "red",
@@ -130,17 +94,11 @@ module.exports = function (RED) {
         }
 
 
-        function addToDiscovery(msg) {
-            var send = sendToDiscoveryJSON;
-
-            if (msg.payload.content instanceof Buffer || msg.payload.content instanceof stream.Readable) {
-                send = sendToDiscoveryBIN;
-            }
-
-            send(msg).then(function (response) {
+        function deleteDiscovery(msg) {
+            deleteDocumentDiscovery(msg).then(function (response) {
                 if (response !== 429) {
                     msg.payload = response;
-                    msg.q_size = insert_queue.length;
+                    msg.q_size = delete_queue.length;
                     node.send(msg);
                 } else if (response === 429) {
                     addToQueue(msg);
@@ -155,26 +113,20 @@ module.exports = function (RED) {
         }
 
         function addToQueue(msg) {
-            if (insert_queue.length <= max_Q_size) {
-                insert_queue.push(msg);
+            if (delete_queue.length < max_Q_size) {
+                delete_queue.push(msg);
             } else {
                 node.error("Queue Full, dropping Message");
             }
         }
 
         node.on('input', function (msg) {
-            addToDiscovery(msg);
-        });
-
-        this.on('close', function () {
-            // tidy up any
-            clearInterval(pq_to);
-            clearInterval(up_to);
+            deleteDiscovery(msg);
         });
     }
 
 
-    RED.nodes.registerType("discovery-insert", DiscoveryInsert, {
+    RED.nodes.registerType("discovery-delete", DiscoveryDelete, {
         credentials: {
             username: {
                 type: "text"

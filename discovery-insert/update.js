@@ -31,7 +31,7 @@ module.exports = function (RED) {
 
         var update_queue = [];
 
-        //allow for overide of delay
+        //allow for override of delay
         var delay = (config.delay !== 0) ? parseInt(config.delay) : 1000;
         var max_Q_size = (config.max_Q_size !== 0) ? parseInt(config.max_Q_size) : 10000;
 
@@ -69,7 +69,7 @@ module.exports = function (RED) {
                     fileContentType: 'application/json',
                 };
 
-                discovery.addDocument(document_obj).then((response) => {
+                discovery.updateDocument(document_obj).then((response) => {
                     resolve(response);
                 }).catch((err) => {
                     if (err.code === 429) {

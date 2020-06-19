@@ -1,0 +1,96 @@
+<script type="text/javascript">
+  RED.nodes.registerType('discovery-delete', {
+    category: 'function',
+    color: '#a6bbcf',
+    defaults: {
+      name: {
+        value: ""
+      },
+      endpoint: {
+        value: ""
+      },
+      environment: {
+        value: ""
+      },
+      collection: {
+        value: ""
+      },
+      delay: {
+        value: 1000,
+        validate: RED.validators.number()
+      },
+      max_Q_size: {
+        value: 10000,
+        validate: RED.validators.number()
+      },
+    },
+    credentials: {
+      username: {
+        type: "text"
+      },
+      password: {
+        type: "password"
+      },
+      apikey: {
+        type: "password"
+      }
+    },
+    inputs: 1,
+    outputs: 1,
+    icon: "file.png",
+    label: function () {
+      return this.name || "discovery-delete";
+    }
+  });
+</script>
+
+<script type="text/x-red" data-template-name="discovery-delete">
+  <div class="form-row">
+    <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+    <input type="text" id="node-input-name" placeholder="Name">
+  </div>
+  <div class="form-row">
+    <label for="node-input-username"><i class="icon-tag"></i> Username</label>
+    <input type="text" id="node-input-username">
+  </div>
+  <div class="form-row">
+    <label for="node-input-password"><i class="icon-tag"></i> Password</label>
+    <input type="password" id="node-input-password">
+  </div>
+  <div class="form-row">
+    <label for="node-input-apikey"><i class="icon-tag"></i> APIKEY</label>
+    <input type="password" id="node-input-apikey">
+  </div>
+  <div class="form-row">
+    <label for="node-input-endpoint"><i class="icon-tag"></i> Service Endpoint</label>
+    <input type="text" id="node-input-endpoint">
+  </div>
+  <div class="form-row">
+    <label for="node-input-environment"><i class="icon-tag"></i> Environment</label>
+    <input type="text" id="node-input-environment" placeholder="environment">
+  </div>
+  <div class="form-row">
+    <label for="node-input-collection"><i class="icon-tag"></i> Collection</label>
+    <input type="text" id="node-input-collection" placeholder="collection">
+  </div>
+  <div class="form-row">
+    <label for="node-input-delay"><i class="icon-tag"></i> Delay</label>
+    <input type="text" id="node-input-delay" placeholder="1000">
+  </div>
+  <div class="form-row">
+    <label for="node-input-max_Q_size"><i class="icon-tag"></i> Max Q</label>
+    <input type="text" id="node-input-max_Q_size" placeholder="10000">
+  </div>
+</script>
+
+<script type="text/x-red" data-help-name="discovery-delete">
+  <p>A simple node that deletes a document from watson discovery service.</p>
+  <code>msg.environment_id</code> will override environment_id
+  <code>msg.collection_id</code> will override collection_id
+  <code>msg.document_id</code> is <b>Required</b>
+
+  For use with Binary files. e.g pdf or docx set
+
+  <code>msg.payload.content</code> to a JSON or a Buffer containing the file contents
+  <code>msg.payload.filename</code> to the name of the file.
+</script>

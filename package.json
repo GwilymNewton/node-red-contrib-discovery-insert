@@ -28,7 +28,8 @@
   "node-red": {
     "nodes": {
       "discovery-insert": "discovery-insert/insert.js",
-      "discovery-update": "discovery-insert/update.js"
+      "discovery-update": "discovery-insert/update.js",
+      "discovery-delete": "discovery-insert/delete.js"
     }
   }
 }
