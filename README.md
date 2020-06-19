@@ -16,8 +16,11 @@ The nodes both contain quing systems, and will auto retry if discovery responds 
 ```javascript
 msg.datatype = "JSON"
 msg.payload = {
-              sampledata:"some data goes here"
-              };
+    content: {
+        sampledata:"some data goes here"
+    },
+    filename: "sample_json.json"
+};
 return msg;
 ```
 
@@ -26,9 +29,9 @@ return msg;
 ```javascript
 msg.datatype = "BIN"
 msg.payload = {
-              content = msg.payload.content //This should be a Buffer from an fs.readFileSync(),
-              fileName = "updated_doc_v2.pdf"
-              }
+    content: msg.payload.content, //This should be a Buffer from an fs.readFileSync(),
+    filename: "updated_doc_v2.pdf"
+};
 msg.document_id = "6022b729-f180-4772-88a7-f73333594ead"
 
 return msg;
@@ -39,8 +42,10 @@ return msg;
 ```javascript
 msg.datatype = "JSON"
 msg.payload = {
-              sampledata:"some data goes here"
-              };
+    content: {
+        sampledata:"some data goes here"
+    }
+};
 msg.environment_id = "env_id";
 msg.collection_id = "collection_id"
 return msg;

@@ -1,5 +1,5 @@
 <script type="text/javascript">
-  RED.nodes.registerType('discovery-insert', {
+  RED.nodes.registerType('discovery-delete', {
     category: 'function',
     color: '#a6bbcf',
     defaults: {
@@ -39,12 +39,12 @@
     outputs: 1,
     icon: "file.png",
     label: function () {
-      return this.name || "discovery-insert";
+      return this.name || "discovery-delete";
     }
   });
 </script>
 
-<script type="text/x-red" data-template-name="discovery-insert">
+<script type="text/x-red" data-template-name="discovery-delete">
   <div class="form-row">
     <label for="node-input-name"><i class="icon-tag"></i> Name</label>
     <input type="text" id="node-input-name" placeholder="Name">
@@ -83,10 +83,11 @@
   </div>
 </script>
 
-<script type="text/x-red" data-help-name="discovery-insert">
-  <p>A simple node that sends data to the watson discovery service.</p>
+<script type="text/x-red" data-help-name="discovery-delete">
+  <p>A simple node that deletes a document from watson discovery service.</p>
   <code>msg.environment_id</code> will override environment_id
   <code>msg.collection_id</code> will override collection_id
+  <code>msg.document_id</code> is <b>Required</b>
 
   For use with Binary files. e.g pdf or docx set
 
