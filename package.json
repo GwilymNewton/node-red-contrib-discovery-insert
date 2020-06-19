@@ -1,7 +1,7 @@
 {
   "name": "node-red-contrib-discovery-insert-temp",
   "description": "A node for inserting documents into the watson discovery service.",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "maintainers": [
     {
       "name": "Gwilym Newton",
